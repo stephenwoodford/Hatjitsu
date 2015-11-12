@@ -88,6 +88,31 @@ function RoomCtrl($scope, $routeParams, $timeout, socket) {
     return a + b;
   };
 
+
+function standardDeviation(values){
+  var avg = average(values);
+
+  var squareDiffs = values.map(function(value){
+    var diff = value - avg;
+    var sqrDiff = diff * diff;
+    return sqrDiff;
+  });
+
+  var avgSquareDiff = average(squareDiffs);
+
+  var stdDev = Math.sqrt(avgSquareDiff);
+  return stdDev;
+}
+
+function average(data){
+  var sum = data.reduce(function(sum, value){
+    return sum + value;
+  }, 0);
+
+  var avg = sum / data.length;
+  return avg;
+}
+
   // wipe out vote if voting state is not yet finished to prevent cheating.
   // if it has already been set - use the actual vote. This works for unvoting - so that
   // before the flip occurs - we don't display 'oi'
@@ -102,8 +127,9 @@ function RoomCtrl($scope, $routeParams, $timeout, socket) {
     $scope.placeholderVotes = voteArr;
 
 
-    var total =  _.reduce(_.map(_.pluck($scope.votes, 'vote'), parseFloat), sumOfTwo, 0);
-    $scope.votingAverage = Math.round(total / $scope.votes.length);
+    var voteList =  _.map(_.pluck($scope.votes, 'vote'), parseFloat).filter(Number);
+    $scope.votingAverage = Math.round(average(voteList));
+    $scope.votingSTDev = Math.round(standardDeviation(voteList)*100)/100;
 
     $scope.forceRevealDisable = (!$scope.forcedReveal && ($scope.votes.length < $scope.voterCount || $scope.voterCount === 0)) ? false : true;
 
@@ -390,6 +416,7 @@ function RoomCtrl($scope, $routeParams, $timeout, socket) {
 
   $scope.dropDown = new DropDown('#dd');
   $scope.votingAverage = 0;
+  $scope.votingSTDev = 0;
 }
 
 RoomCtrl.$inject = ['$scope', '$routeParams', '$timeout', 'socket'];

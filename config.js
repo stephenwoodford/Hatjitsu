@@ -8,6 +8,6 @@ module.exports = {
   production: {
     hostname: "hatjitsu.cnx.org",
     port: 5000,
-    packAssets: true
+    packAssets: false
   }
 };

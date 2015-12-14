@@ -86,6 +86,13 @@ app.get('/debug_state', function(req, res) {
   });
 });
 
+app.get('/new', function(req, res) {
+  var room = lobby.getRoom(lobby.createRoom());
+  res.json({
+    "room": room.info()
+  });
+});
+
 app.get('/styleguide', function(req, res) {
   res.render('styleguide.ejs');
 });
@@ -94,7 +101,7 @@ app.get('/:id', function(req, res) {
   if (req.params.id in lobby.rooms) {
     res.render('index.ejs');
   } else {
-   res.redirect('/');  
+   res.redirect('/');
   }
 });
 
@@ -137,7 +144,7 @@ io.sockets.on('connection', function (socket) {
     // console.log("On disconnect", socket.id);
     lobby.broadcastDisconnect(socket);
   });
-  
+
   socket.on('create room', function (data, callback) {
     statsSocketMessagesReceived++;
     // console.log("on create room", socket.id, data);
